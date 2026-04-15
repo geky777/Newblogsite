@@ -1,0 +1,559 @@
+@import 'tailwindcss';
+
+@plugin 'daisyui';
+
+@plugin "daisyui/theme" {
+  name: "sunset";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(22% 0.019 237.69);
+  --color-base-200: oklch(20% 0.019 237.69);
+  --color-base-300: oklch(18% 0.019 237.69);
+  --color-base-content: oklch(77.383% 0.043 245.096);
+  --color-primary: oklch(74.703% 0.158 39.947);
+  --color-primary-content: oklch(14.94% 0.031 39.947);
+  --color-secondary: oklch(72.537% 0.177 2.72);
+  --color-secondary-content: oklch(14.507% 0.035 2.72);
+  --color-accent: oklch(71.294% 0.166 299.844);
+  --color-accent-content: oklch(14.258% 0.033 299.844);
+  --color-neutral: oklch(26% 0.019 237.69);
+  --color-neutral-content: oklch(70% 0.019 237.69);
+  --color-info: oklch(85.559% 0.085 206.015);
+  --color-info-content: oklch(17.111% 0.017 206.015);
+  --color-success: oklch(85.56% 0.085 144.778);
+  --color-success-content: oklch(17.112% 0.017 144.778);
+  --color-warning: oklch(85.569% 0.084 74.427);
+  --color-warning-content: oklch(17.113% 0.016 74.427);
+  --color-error: oklch(85.511% 0.078 16.886);
+  --color-error-content: oklch(17.102% 0.015 16.886);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "cupcake";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(97.788% 0.004 56.375);
+  --color-base-200: oklch(93.982% 0.007 61.449);
+  --color-base-300: oklch(91.586% 0.006 53.44);
+  --color-base-content: oklch(23.574% 0.066 313.189);
+  --color-primary: oklch(85% 0.138 181.071);
+  --color-primary-content: oklch(43% 0.078 188.216);
+  --color-secondary: oklch(89% 0.061 343.231);
+  --color-secondary-content: oklch(45% 0.187 3.815);
+  --color-accent: oklch(90% 0.076 70.697);
+  --color-accent-content: oklch(47% 0.157 37.304);
+  --color-neutral: oklch(27% 0.006 286.033);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(69% 0.17 162.48);
+  --color-success-content: oklch(26% 0.051 172.552);
+  --color-warning: oklch(79% 0.184 86.047);
+  --color-warning-content: oklch(28% 0.066 53.813);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 1rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.{js,jsx,ts,tsx}';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* DaisyUI theme support */
+[data-theme='cupcake'] {
+    color-scheme: light;
+}
+
+[data-theme='sunset'] {
+    color-scheme: dark;
+}
+
+/* Ensure theme controller works */
+html {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Shared Header Styles */
+.shared-header {
+    background-color: var(--color-base-100);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--color-base-300);
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.shared-header-brand {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.shared-header-brand:hover {
+    background-color: var(--color-base-200);
+}
+
+.shared-header-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.25rem;
+}
+
+.shared-header-menu li {
+    list-style: none;
+}
+
+.shared-header-menu a {
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    color: var(--color-base-content);
+}
+
+.shared-header-menu a:hover {
+    background-color: var(--color-base-200);
+}
+
+/* Active page highlighting */
+.shared-header-menu .active {
+    background-color: var(--color-primary);
+    color: var(--color-primary-content);
+}
+
+.create-post-body {
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px;
+    background-image:
+        radial-gradient(ellipse at 10% 20%, rgba(200, 119, 58, 0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(200, 119, 58, 0.05) 0%, transparent 50%);
+}
+
+.create-post-body *,
+.create-post-body *::before,
+.create-post-body *::after {
+    box-sizing: border-box;
+}
+
+.create-post-body {
+    --cream: #F5F0E8;
+    --warm-white: #FDFAF5;
+    --ink: #1C1612;
+    --ink-muted: #6B5E52;
+    --accent: #C8773A;
+    --accent-light: #F2E4D4;
+    --border: #DDD5C8;
+    --shadow: rgba(28, 22, 18, 0.08);
+}
+
+.create-post-page {
+    width: 100%;
+    max-width: 680px;
+    animation: createPostFadeUp 0.6s ease both;
+}
+
+@keyframes createPostFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.create-post-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.create-post-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.create-post-title span {
+    color: var(--accent);
+    font-style: italic;
+}
+
+.create-post-back {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+
+.create-post-back:hover {
+    color: var(--accent);
+}
+
+.create-post-back::before {
+    content: '<';
+    font-size: 1rem;
+}
+
+.create-post-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 44px 48px;
+    box-shadow:
+        0 1px 2px var(--shadow),
+        0 8px 32px var(--shadow),
+        0 0 0 1px var(--border);
+    animation: createPostFadeUp 0.6s 0.1s ease both;
+}
+
+.create-post-section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.create-post-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.create-post-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.create-post-field label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.create-post-field input,
+.create-post-field button,
+.create-post-field textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    width: 100%;
+}
+
+.create-post-field input::placeholder,
+.create-post-field textarea::placeholder {
+    color: #B8AFA5;
+}
+
+.create-post-field input:focus,
+.create-post-field button:focus,
+.create-post-field textarea:focus {
+    border-color: var(--accent);
+    background: var(--warm-white);
+    box-shadow: 0 0 0 3px rgba(200, 119, 58, 0.12);
+}
+
+.create-post-field textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.65;
+}
+
+.create-post-upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+}
+
+.create-post-upload-area:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
+.create-post-upload-area input[type='file'] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+}
+
+.create-post-upload-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.2rem;
+}
+
+.create-post-upload-area p {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+}
+
+.create-post-upload-area strong {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.create-post-upload-hint {
+    font-size: 0.72rem;
+    color: #B8AFA5;
+    margin-top: 4px;
+}
+
+.create-post-separator {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+}
+
+.create-post-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.create-post-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 50px;
+    padding: 13px 28px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.create-post-btn-ghost {
+    background: transparent;
+    color: var(--ink-muted);
+    border: 1.5px solid var(--border);
+}
+
+.create-post-btn-ghost:hover {
+    border-color: var(--ink-muted);
+    color: var(--ink);
+}
+
+.create-post-btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(200, 119, 58, 0.35);
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.create-post-btn-primary:hover {
+    background: #B8672E;
+    box-shadow: 0 6px 20px rgba(200, 119, 58, 0.45);
+    transform: translateY(-1px);
+}
+
+.create-post-btn-primary:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+    .create-post-card {
+        padding: 28px 22px;
+    }
+
+    .create-post-fields-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hover-3d {
+    position: relative;
+    display: block;
+    perspective: 1000px;
+    width: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.hover-3d-target {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 180ms ease;
+    width: 100%;
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.hover-3d img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+}
+
+.hover-3d-zone {
+    position: absolute;
+    z-index: 10;
+    width: 33.3333%;
+    height: 33.3333%;
+    background: transparent;
+    opacity: 0;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(1) {
+    top: 0;
+    left: 0;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(2) {
+    top: 0;
+    left: 33.3333%;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(3) {
+    top: 0;
+    left: 66.6666%;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(4) {
+    top: 33.3333%;
+    left: 0;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(5) {
+    top: 33.3333%;
+    left: 66.6666%;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(6) {
+    top: 66.6666%;
+    left: 0;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(7) {
+    top: 66.6666%;
+    left: 33.3333%;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(8) {
+    top: 66.6666%;
+    left: 66.6666%;
+}
+
+.hover-3d > .hover-3d-zone:nth-child(1):hover ~ .hover-3d-target {
+    transform: rotateX(12deg) rotateY(-12deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(2):hover ~ .hover-3d-target {
+    transform: rotateX(12deg) rotateY(0deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(3):hover ~ .hover-3d-target {
+    transform: rotateX(12deg) rotateY(12deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(4):hover ~ .hover-3d-target {
+    transform: rotateX(0deg) rotateY(-12deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(5):hover ~ .hover-3d-target {
+    transform: rotateX(0deg) rotateY(12deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(6):hover ~ .hover-3d-target {
+    transform: rotateX(-12deg) rotateY(-12deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(7):hover ~ .hover-3d-target {
+    transform: rotateX(-12deg) rotateY(0deg);
+}
+
+.hover-3d > .hover-3d-zone:nth-child(8):hover ~ .hover-3d-target {
+    transform: rotateX(-12deg) rotateY(12deg);
+}
+
