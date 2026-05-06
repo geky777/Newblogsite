@@ -7,6 +7,12 @@ composer install --no-dev --working-dir=/var/www/html --optimize-autoloader
 echo "Linking storage..."
 php artisan storage:link || true
 
+echo "Ensuring production asset mode..."
+rm -f /var/www/html/public/hot
+
+echo "Clearing stale caches..."
+php artisan optimize:clear
+
 echo "Caching config..."
 php artisan config:cache
 

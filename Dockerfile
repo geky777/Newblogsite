@@ -3,15 +3,15 @@ FROM node:22-alpine AS assets
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
-COPY resources ./resources
-COPY public ./public
-COPY vite.config.js ./
+COPY . .
 
 RUN npm run build
 
 FROM richarvey/nginx-php-fpm:3.1.6
+
+COPY conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
 
 COPY . /var/www/html
 COPY --from=assets /app/public/build /var/www/html/public/build
@@ -23,6 +23,7 @@ RUN mkdir -p \
     /var/www/html/storage/framework/testing \
     /var/www/html/storage/framework/views \
     /var/www/html/bootstrap/cache \
+    && rm -f /var/www/html/public/hot \
     && chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache
 

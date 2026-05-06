@@ -35,7 +35,7 @@ services:
       - key: APP_URL
         sync: false
       - key: ASSET_URL
-        sync: false
+        value: ""
       - key: DB_HOST
         sync: false
       - key: DB_USERNAME
