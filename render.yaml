@@ -26,6 +26,8 @@ services:
         value: database
       - key: CACHE_STORE
         value: database
+      - key: VIEW_COMPILED_PATH
+        value: /var/www/html/storage/framework/views
       - key: QUEUE_CONNECTION
         value: sync
       - key: APP_KEY
