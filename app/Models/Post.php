@@ -26,11 +26,42 @@ class Post extends Model
         return 'slug';
     }
 
-    public function getFeaturedImageUrlAttribute(): ?string
+    public function getFeaturedImagesAttribute(): array
     {
         $value = $this->attributes['featured_image'] ?? null;
+        $storedValues = $this->extractStoredImageValues($value);
+        $normalizedValues = array_map(fn (string $storedValue) => $this->normalizeImageUrl($storedValue), $storedValues);
 
-        if (! $value) {
+        return array_values(array_filter($normalizedValues, fn (?string $normalizedValue) => is_string($normalizedValue)));
+    }
+
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        $images = $this->getFeaturedImagesAttribute();
+
+        return $images[0] ?? null;
+    }
+
+    protected function extractStoredImageValues(?string $value): array
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return [];
+        }
+
+        $decodedValue = json_decode($value, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedValue)) {
+            return array_values(array_filter($decodedValue, fn ($image) => is_string($image) && trim($image) !== ''));
+        }
+
+        return [$value];
+    }
+
+    protected function normalizeImageUrl(string $value): ?string
+    {
+        $value = trim($value);
+
+        if ($value === '') {
             return null;
         }
 

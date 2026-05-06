@@ -33,10 +33,7 @@ class BlogController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $this->validatePost($request);
-
-        $featuredImageUrl = $request->hasFile('featured_image')
-            ? Storage::url($request->file('featured_image')->store('blog-featured', 'public'))
-            : null;
+        $uploadedImageUrls = $this->storeUploadedImages($request);
 
         Post::create([
             'title' => $validated['title'],
@@ -45,7 +42,7 @@ class BlogController extends Controller
             'task' => $validated['task'],
             'week' => $validated['week'],
             'date' => $validated['date'],
-            'featured_image' => $featuredImageUrl,
+            'featured_image' => $this->encodeFeaturedImages($uploadedImageUrls),
         ]);
 
         return redirect()
@@ -63,11 +60,13 @@ class BlogController extends Controller
     public function update(Request $request, Post $post): \Illuminate\Http\RedirectResponse
     {
         $validated = $this->validatePost($request);
-        $featuredImageUrl = $post->featured_image;
+        $existingImageUrls = $this->decodeStoredImages($post->getRawOriginal('featured_image'));
+        $uploadedImageUrls = $this->storeUploadedImages($request);
+        $updatedImageUrls = $existingImageUrls;
 
-        if ($request->hasFile('featured_image')) {
-            $featuredImageUrl = Storage::url($request->file('featured_image')->store('blog-featured', 'public'));
-            $this->deleteImage($post->featured_image);
+        if ($uploadedImageUrls !== []) {
+            $this->deleteImages($existingImageUrls);
+            $updatedImageUrls = $uploadedImageUrls;
         }
 
         $post->update([
@@ -77,7 +76,7 @@ class BlogController extends Controller
             'task' => $validated['task'],
             'week' => $validated['week'],
             'date' => $validated['date'],
-            'featured_image' => $featuredImageUrl,
+            'featured_image' => $this->encodeFeaturedImages($updatedImageUrls),
         ]);
 
         return redirect()
@@ -87,10 +86,10 @@ class BlogController extends Controller
 
     public function destroy(Post $post): \Illuminate\Http\RedirectResponse
     {
-        $featuredImageUrl = $post->featured_image;
+        $featuredImageUrls = $this->decodeStoredImages($post->getRawOriginal('featured_image'));
 
         $post->delete();
-        $this->deleteImage($featuredImageUrl);
+        $this->deleteImages($featuredImageUrls);
 
         return redirect()
             ->route('admin.blog.index')
@@ -106,6 +105,8 @@ class BlogController extends Controller
             'week' => ['required', 'string', 'max:255'],
             'date' => ['required', 'date'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'featured_images' => ['nullable', 'array', 'max:10'],
+            'featured_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
     }
 
@@ -120,6 +121,7 @@ class BlogController extends Controller
             'week' => $post->week,
             'date' => $post->date?->toDateString(),
             'featured_image' => $post->featured_image_url,
+            'featured_images' => $post->featured_images,
             'created_at' => $post->created_at?->toDateTimeString(),
         ];
     }
@@ -141,6 +143,13 @@ class BlogController extends Controller
         return $slug;
     }
 
+    protected function deleteImages(array $imageUrls): void
+    {
+        foreach ($imageUrls as $imageUrl) {
+            $this->deleteImage($imageUrl);
+        }
+    }
+
     protected function deleteImage(?string $imageUrl): void
     {
         $path = $this->resolvePublicDiskPath($imageUrl);
@@ -148,6 +157,54 @@ class BlogController extends Controller
         if ($path) {
             Storage::disk('public')->delete($path);
         }
+    }
+
+    protected function storeUploadedImages(Request $request): array
+    {
+        $files = $request->file('featured_images', []);
+        $files = is_array($files) ? $files : [$files];
+
+        if ($files === [] && $request->hasFile('featured_image')) {
+            $files = [$request->file('featured_image')];
+        }
+
+        return collect($files)
+            ->filter()
+            ->map(fn ($file) => Storage::url($file->store('blog-featured', 'public')))
+            ->values()
+            ->all();
+    }
+
+    protected function decodeStoredImages(?string $storedValue): array
+    {
+        if (! is_string($storedValue) || trim($storedValue) === '') {
+            return [];
+        }
+
+        $decodedValue = json_decode($storedValue, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedValue)) {
+            return array_values(array_filter($decodedValue, fn ($image) => is_string($image) && trim($image) !== ''));
+        }
+
+        return [$storedValue];
+    }
+
+    protected function encodeFeaturedImages(array $imageUrls): ?string
+    {
+        $imageUrls = array_values(array_filter($imageUrls, fn ($image) => is_string($image) && trim($image) !== ''));
+
+        if ($imageUrls === []) {
+            return null;
+        }
+
+        if (count($imageUrls) === 1) {
+            return $imageUrls[0];
+        }
+
+        $encodedValue = json_encode($imageUrls, JSON_UNESCAPED_SLASHES);
+
+        return is_string($encodedValue) ? $encodedValue : $imageUrls[0];
     }
 
     protected function resolvePublicDiskPath(?string $imageUrl): ?string

@@ -17,108 +17,177 @@ export default function Home({ recentPosts = [] }) {
 
     return (
         <>
-            <div className="p-4">
-                <div className="mx-auto mb-4 flex w-full max-w-7xl flex-col gap-4">
-                    <FlashBanner />
-                </div>
+            {/* Hero Section */}
+            <section className="relative py-12 sm:py-16 lg:py-24 px-4 bg-gradient-to-b from-base-100 to-base-100/50">
+                <div className="mx-auto max-w-7xl">
+                    <div className="grid grid-cols-1 gap-12 lg:gap-16 lg:grid-cols-2 lg:items-center">
+                        {/* Hero Content */}
+                        <div className="flex flex-col justify-center space-y-6">
+                            <div className="space-y-4">
+                                <div className="inline-block">
+                                    <div className="badge badge-primary badge-lg font-semibold">Welcome</div>
+                                </div>
+                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-base-content leading-tight">
+                                    Hi, I&apos;m{' '}
+                                    <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                        Lord Zaro Fiber A. Quintanilla
+                                    </span>
+                                </h1>
+                                <p className="text-lg text-base-content/70 leading-relaxed max-w-lg">
+                                    Welcome to my weekly blog. I document my learning journey every week through class projects and personal builds. This is where I share what I&apos;m making, reading, and figuring out.
+                                </p>
+                            </div>
 
-                <div className="card mx-auto w-full max-w-7xl items-stretch border border-base-300 bg-base-100 shadow-sm transition lg:card-side">
-                    <div className="card-body">
-                        <h1 className="text-4xl font-black leading-tight md:text-6xl">
-                            Hi, Iam{' '}
-                            <span className="text-primary italic">Lord Zaro Fiber A. Quintanilla</span>, Welcome To my
-                            Weekly Blog Site
-                        </h1>
-
-                        <p className="max-w-xl text-base-content/70">
-                            I document my learning journey every week - from class projects to personal builds. This is
-                            where I share what I&apos;m making, reading, and figuring out.
-                        </p>
-
-                        <div className="card-actions justify-start gap-3 pt-2">
-                            <button className="btn btn-neutral rounded-full">Get to Know Me</button>
-                            <Link href="/blog" className="btn btn-outline rounded-full">
-                                Read My Blog
-                            </Link>
-                            {isAdmin ? (
-                                <Link href="/admin/blog/create" className="btn btn-primary rounded-full">
-                                    Add Blog
+                            {/* CTA Buttons */}
+                            <div className="flex flex-wrap gap-4 pt-4">
+                                <Link 
+                                    href="/blog" 
+                                    className="btn btn-primary btn-lg font-semibold rounded-lg"
+                                >
+                                    Read My Blog
                                 </Link>
-                            ) : null}
-                        </div>
-                    </div>
-
-                    <figure className="flex items-center justify-end p-4 lg:w-5/12 lg:p-6">
-                        <div className="hover-3d h-64 w-full max-w-md translate-x-2 sm:h-74 lg:h-74 lg:translate-x-4">
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-zone"></div>
-                            <div className="hover-3d-target h-full overflow-hidden rounded-2xl">
-                                <img
-                                    className="h-full w-full object-cover"
-                                    src="https://img.daisyui.com/images/stock/creditcard.webp"
-                                    alt="3D card"
-                                />
+                                <button className="btn btn-outline btn-lg font-semibold rounded-lg">
+                                    Get to Know Me
+                                </button>
+                                {isAdmin ? (
+                                    <Link 
+                                        href="/admin/blog/create" 
+                                        className="btn btn-secondary btn-lg font-semibold rounded-lg"
+                                    >
+                                        Create Post
+                                    </Link>
+                                ) : null}
                             </div>
                         </div>
-                    </figure>
+
+                        {/* Hero Image */}
+                        <div className="flex items-center justify-center">
+                            <div className="relative w-full max-w-md">
+                                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-3xl"></div>
+                                <figure className="relative rounded-2xl overflow-hidden border border-base-300 shadow-xl">
+                                    <img
+                                        className="w-full h-auto object-cover aspect-square"
+                                        src="/images/card-holder.jpg"
+                                        alt="Profile"
+                                    />
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Flash Messages */}
+            <div className="px-4 py-4">
+                <div className="mx-auto max-w-7xl">
+                    <FlashBanner />
                 </div>
             </div>
 
-            <div className="px-4 pb-10">
-                <div className="flex items-center gap-4 py-6">
-                    <div className="text-xs font-semibold tracking-widest text-base-content/60">MY BLOGS</div>
-                    <div className="h-px flex-1 bg-base-300"></div>
-                </div>
+            {/* Featured Posts Section */}
+            <section className="py-16 sm:py-20 px-4 bg-base-100">
+                <div className="mx-auto max-w-7xl">
+                    {/* Section Header */}
+                    <div className="mb-12 text-center sm:text-left">
+                        <div className="inline-block mb-4">
+                            <div className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">Featured Work</div>
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-base-content mb-4">
+                            Latest Blog Posts
+                        </h2>
+                        <div className="w-12 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
+                    </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {recentPosts.map((post) => (
-                        <article
-                            key={post.id}
-                            className="card overflow-hidden border border-base-300 bg-base-100 shadow-sm"
-                        >
-                            <Link href={`/blog/${post.slug}`} className="block">
-                                <figure className="relative h-56 sm:h-64">
-                                    <img
-                                        className="h-full w-full object-cover"
-                                        src={post.featured_image || fallbackImage}
-                                        alt={post.title}
-                                    />
-                                    <div className="absolute left-4 top-4 badge badge-secondary">{post.week}</div>
-                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-black/0 p-4">
-                                        <div className="text-xs text-white/80">{post.date || ''}</div>
-                                        <div className="mt-1 text-lg font-bold leading-snug text-white sm:text-xl">
-                                            {post.title}
+                    {/* Posts Grid */}
+                    {recentPosts.length === 0 ? (
+                        <div className="card border border-base-300 bg-base-100 shadow-md">
+                            <div className="card-body text-center py-12">
+                                <h3 className="card-title justify-center text-xl font-bold text-base-content">
+                                    No posts yet
+                                </h3>
+                                <p className="text-base-content/70">Check back soon for the latest updates.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {recentPosts.map((post) => (
+                                <article
+                                    key={post.id}
+                                    className="group card bg-base-100 border border-base-300 shadow-md hover:shadow-lg hover:border-primary/50 transition-all duration-300 overflow-hidden"
+                                >
+                                    {/* Image */}
+                                    <Link href={`/blog/${post.slug}`} className="block">
+                                        <figure className="relative h-64 bg-base-200 overflow-hidden">
+                                            <img
+                                                className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                src={post.featured_image || fallbackImage}
+                                                alt={post.title}
+                                            />
+                                            <div className="absolute top-4 left-4">
+                                                <div className="badge badge-primary font-semibold">{post.week}</div>
+                                            </div>
+                                        </figure>
+                                    </Link>
+
+                                    {/* Content */}
+                                    <div className="card-body gap-4">
+                                        {/* Meta Tags */}
+                                        <div className="flex flex-wrap gap-2">
+                                            <div className="badge badge-outline text-xs">{post.task}</div>
+                                            <div className="text-xs text-base-content/60 font-medium">{post.date || 'No date'}</div>
+                                        </div>
+
+                                        {/* Title and Link */}
+                                        <Link href={`/blog/${post.slug}`} className="block">
+                                            <h3 className="card-title text-xl font-bold text-base-content group-hover:text-primary transition-colors line-clamp-2">
+                                                {post.title}
+                                            </h3>
+                                        </Link>
+
+                                        {/* Actions */}
+                                        <div className="card-actions justify-between pt-2 border-t border-base-300">
+                                            <Link href={`/blog/${post.slug}`} className="btn btn-ghost btn-sm font-medium">
+                                                Read More →
+                                            </Link>
+                                            {isAdmin && (
+                                                <div className="flex gap-2">
+                                                    <Link
+                                                        href={`/admin/blog/${post.slug}/edit`}
+                                                        className="btn btn-outline btn-xs"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-error btn-xs"
+                                                        onClick={() => handleDelete(post)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                </figure>
-                            </Link>
+                                </article>
+                            ))}
+                        </div>
+                    )}
 
-                            {isAdmin ? (
-                                <div className="card-body pt-4">
-                                    <div className="card-actions justify-end">
-                                        <Link href={`/admin/blog/${post.slug}/edit`} className="btn btn-outline btn-sm">
-                                            Update
-                                        </Link>
-                                        <button
-                                            type="button"
-                                            className="btn btn-error btn-sm"
-                                            onClick={() => handleDelete(post)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : null}
-                        </article>
-                    ))}
+                    {/* View All Button */}
+                    <div className="mt-12 text-center">
+                        <Link href="/blog" className="btn btn-outline btn-lg font-semibold">
+                            View All Posts
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-base-200 border-t border-base-300 py-8">
+                <div className="mx-auto max-w-7xl px-4 text-center text-base-content/70">
+                    <p className="font-medium">© 2024 Weekly Blog. All rights reserved.</p>
+                </div>
+            </footer>
         </>
     );
 }

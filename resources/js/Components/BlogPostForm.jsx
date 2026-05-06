@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
+import ImageLightbox from './ImageLightbox';
 
 const normalizeDate = (value) => {
     if (typeof value !== 'string') return '';
@@ -22,11 +23,25 @@ export default function BlogPostForm({
         task: post?.task ?? '',
         week: post?.week ?? '',
         date: normalizeDate(post?.date ?? ''),
-        featured_image: null,
+        featured_images: [],
         ...(submitMethod === 'put' ? { _method: 'put' } : {}),
     });
 
-    const selectedFileName = data.featured_image?.name ?? '';
+    const selectedFiles = Array.isArray(data.featured_images) ? data.featured_images : [];
+    const selectedFileNames = selectedFiles
+        .map((file) => file?.name)
+        .filter((name) => typeof name === 'string' && name !== '');
+    const existingImages = Array.isArray(post?.featured_images) && post.featured_images.length > 0
+        ? post.featured_images
+        : (post?.featured_image ? [post.featured_image] : []);
+    const existingImagesRemainder = existingImages.length % 3;
+    const featuredImageErrors = [
+        errors.featured_images,
+        ...Object.entries(errors)
+            .filter(([key]) => key.startsWith('featured_images.'))
+            .map(([, message]) => message),
+    ].filter((message) => typeof message === 'string' && message !== '');
+    const [activeImage, setActiveImage] = useState(null);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -34,135 +49,273 @@ export default function BlogPostForm({
     };
 
     return (
-        <div className="create-post-body">
-            <div className="create-post-page">
-                <header className="create-post-header">
-                    <h1 className="create-post-title">
-                        {formTitle}
-                        <br />
-                        <span>{formAccent}</span>
+        <div className="space-y-6">
+            {/* Form Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-base-300">
+                <div className="space-y-2">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-base-content">
+                        {formTitle} <span className="text-primary">{formAccent}</span>
                     </h1>
-                    <Link href="/admin/blog" className="create-post-back">
-                        Back to Admin
-                    </Link>
-                </header>
+                </div>
+                <Link href="/admin/blog" className="btn btn-outline btn-lg font-semibold rounded-lg">
+                    ← Back to Dashboard
+                </Link>
+            </div>
 
-                <div className="create-post-card">
-                    <form onSubmit={handleSubmit}>
-                        <p className="create-post-section-label">Post Details</p>
-
-                        <div className="create-post-field">
-                            <label htmlFor="title">Title</label>
-                            <input
-                                id="title"
-                                type="text"
-                                placeholder="Enter an engaging post title..."
-                                value={data.title}
-                                onChange={(event) => setData('title', event.target.value)}
-                            />
-                            {errors.title ? <div className="mt-1 text-sm text-error">{errors.title}</div> : null}
-                        </div>
-
-                        <div className="create-post-fields-row">
-                            <div className="create-post-field">
-                                <label htmlFor="task">Task</label>
-                                <input
-                                    id="task"
-                                    type="text"
-                                    placeholder="e.g. Research, Writing..."
-                                    value={data.task}
-                                    onChange={(event) => setData('task', event.target.value)}
-                                />
-                                {errors.task ? <div className="mt-1 text-sm text-error">{errors.task}</div> : null}
+            {/* Form */}
+            <div className="card border border-base-300 bg-base-100 shadow-md">
+                <div className="card-body p-6 sm:p-8">
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* Post Details Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="badge badge-primary font-bold">Step 1</div>
+                                <h2 className="text-xl font-bold text-base-content">Post Details</h2>
                             </div>
 
-                            <div className="create-post-field">
-                                <label htmlFor="week">Week</label>
+                            {/* Title Field */}
+                            <div className="form-control gap-2">
+                                <label className="label" htmlFor="title">
+                                    <span className="label-text font-semibold text-base">Post Title</span>
+                                </label>
                                 <input
-                                    id="week"
+                                    id="title"
                                     type="text"
-                                    placeholder="e.g. Week 4"
-                                    value={data.week}
-                                    onChange={(event) => setData('week', event.target.value)}
+                                    className={`input input-bordered input-lg font-medium ${
+                                        errors.title ? 'input-error' : 'focus:input-primary'
+                                    }`}
+                                    placeholder="Enter an engaging post title..."
+                                    value={data.title}
+                                    onChange={(event) => setData('title', event.target.value)}
+                                    disabled={processing}
                                 />
-                                {errors.week ? <div className="mt-1 text-sm text-error">{errors.week}</div> : null}
+                                {errors.title && (
+                                    <p className="text-sm text-error font-medium">
+                                        <span className="inline-block mr-1">⚠</span>
+                                        {errors.title}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Task and Week Fields */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="form-control gap-2">
+                                    <label className="label" htmlFor="task">
+                                        <span className="label-text font-semibold text-base">Task</span>
+                                    </label>
+                                    <input
+                                        id="task"
+                                        type="text"
+                                        className={`input input-bordered input-lg font-medium ${
+                                            errors.task ? 'input-error' : 'focus:input-primary'
+                                        }`}
+                                        placeholder="e.g. Research, Writing, Development..."
+                                        value={data.task}
+                                        onChange={(event) => setData('task', event.target.value)}
+                                        disabled={processing}
+                                    />
+                                    {errors.task && (
+                                        <p className="text-sm text-error font-medium">
+                                            <span className="inline-block mr-1">⚠</span>
+                                            {errors.task}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="form-control gap-2">
+                                    <label className="label" htmlFor="week">
+                                        <span className="label-text font-semibold text-base">Week</span>
+                                    </label>
+                                    <input
+                                        id="week"
+                                        type="text"
+                                        className={`input input-bordered input-lg font-medium ${
+                                            errors.week ? 'input-error' : 'focus:input-primary'
+                                        }`}
+                                        placeholder="e.g. Week 4, Week 5..."
+                                        value={data.week}
+                                        onChange={(event) => setData('week', event.target.value)}
+                                        disabled={processing}
+                                    />
+                                    {errors.week && (
+                                        <p className="text-sm text-error font-medium">
+                                            <span className="inline-block mr-1">⚠</span>
+                                            {errors.week}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Date Field */}
+                            <div className="form-control gap-2">
+                                <label className="label" htmlFor="date">
+                                    <span className="label-text font-semibold text-base">Publication Date</span>
+                                </label>
+                                <input
+                                    id="date"
+                                    type="date"
+                                    className={`input input-bordered input-lg font-medium ${
+                                        errors.date ? 'input-error' : 'focus:input-primary'
+                                    }`}
+                                    value={data.date}
+                                    onChange={(event) => setData('date', event.target.value)}
+                                    disabled={processing}
+                                />
+                                {errors.date && (
+                                    <p className="text-sm text-error font-medium">
+                                        <span className="inline-block mr-1">⚠</span>
+                                        {errors.date}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
-                        <div className="create-post-field">
-                            <label htmlFor="date">Date</label>
-                            <input
-                                id="date"
-                                type="date"
-                                value={data.date}
-                                onChange={(event) => setData('date', event.target.value)}
-                            />
-                            {errors.date ? <div className="mt-1 text-sm text-error">{errors.date}</div> : null}
-                        </div>
+                        {/* Divider */}
+                        <div className="divider my-4"></div>
 
-                        <div className="create-post-separator"></div>
-                        <p className="create-post-section-label">Media & Content</p>
+                        {/* Media & Content Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="badge badge-primary font-bold">Step 2</div>
+                                <h2 className="text-xl font-bold text-base-content">Media & Content</h2>
+                            </div>
 
-                        <div className="create-post-field">
-                            <label htmlFor="featured_image">Featured Image</label>
+                            {/* Featured Images */}
+                            <div className="form-control gap-3">
+                                <label className="label" htmlFor="featured_images">
+                                    <span className="label-text font-semibold text-base">Featured Images</span>
+                                </label>
 
-                            {post?.featured_image ? (
-                                <div className="overflow-hidden rounded-2xl border border-base-300 bg-base-200">
-                                    <img
-                                        className="h-56 w-full object-cover"
-                                        src={post.featured_image}
-                                        alt={post.title}
+                                {/* Existing Images Gallery */}
+                                {existingImages.length > 0 && (
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-base-content/70 font-medium">Current Images</p>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {existingImages.map((image, index) => (
+                                                <figure
+                                                    key={`${image}-${index}`}
+                                                    className={`group aspect-square ${
+                                                        existingImagesRemainder === 1 && index === existingImages.length - 1
+                                                            ? 'col-start-2'
+                                                            : existingImagesRemainder === 2 && index === existingImages.length - 1
+                                                                ? 'col-start-3'
+                                                                : ''
+                                                    }`}
+                                                >
+                                                    <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                                                        <button
+                                                            type="button"
+                                                            className="block h-full w-full"
+                                                            onClick={() => setActiveImage(image)}
+                                                        >
+                                                            <img
+                                                                className="h-full w-full cursor-zoom-in object-cover object-center transition-transform duration-200 group-hover:scale-105"
+                                                                src={image}
+                                                                alt={`${post?.title ?? 'Post'} ${index + 1}`}
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </figure>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Upload Area */}
+                                <div className="border-2 border-dashed border-base-300 rounded-xl p-8 text-center bg-base-100/50 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer">
+                                    <label htmlFor="featured_images" className="cursor-pointer block space-y-3">
+                                        <div className="text-4xl">🖼️</div>
+                                        <div>
+                                            <p className="font-bold text-base-content">Click to upload</p>
+                                            <p className="text-sm text-base-content/70">or drag and drop</p>
+                                        </div>
+                                        <p className="text-xs text-base-content/60 font-medium">
+                                            JPG, PNG, or WEBP up to 2MB each (max 10 files)
+                                        </p>
+                                    </label>
+                                    <input
+                                        id="featured_images"
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        multiple
+                                        className="hidden"
+                                        onChange={(event) => setData('featured_images', Array.from(event.target.files ?? []))}
+                                        disabled={processing}
                                     />
                                 </div>
-                            ) : null}
 
-                            <div className="create-post-upload-area">
-                                <input
-                                    id="featured_image"
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/webp"
-                                    onChange={(event) => setData('featured_image', event.target.files?.[0] ?? null)}
-                                />
-                                <p>
-                                    <strong>Click to upload</strong> a new featured image
-                                </p>
-                                <p className="create-post-upload-hint">JPG, PNG, or WEBP up to 2MB</p>
-                                {selectedFileName ? (
-                                    <p className="mt-2 text-sm text-base-content/70">{selectedFileName}</p>
-                                ) : null}
+                                {/* Selected Files */}
+                                {selectedFileNames.length > 0 && (
+                                    <div className="alert alert-success bg-success/10 border border-success/30">
+                                        <span className="text-sm font-medium">
+                                            ✓ {selectedFileNames.length} file(s) selected: {selectedFileNames.join(', ')}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Image Errors */}
+                                {featuredImageErrors.length > 0 && (
+                                    <p className="text-sm text-error font-medium">
+                                        <span className="inline-block mr-1">⚠</span>
+                                        {featuredImageErrors[0]}
+                                    </p>
+                                )}
                             </div>
 
-                            {errors.featured_image ? (
-                                <div className="mt-1 text-sm text-error">{errors.featured_image}</div>
-                            ) : null}
+                            {/* Content Field */}
+                            <div className="form-control gap-2 pt-4">
+                                <label className="label" htmlFor="content">
+                                    <span className="label-text font-semibold text-base">Post Content</span>
+                                </label>
+                                <textarea
+                                    id="content"
+                                    className={`textarea textarea-bordered textarea-lg font-medium ${
+                                        errors.content ? 'textarea-error' : 'focus:textarea-primary'
+                                    }`}
+                                    placeholder="Write your post content here... Tell your story."
+                                    value={data.content}
+                                    onChange={(event) => setData('content', event.target.value)}
+                                    disabled={processing}
+                                    rows="10"
+                                />
+                                {errors.content && (
+                                    <p className="text-sm text-error font-medium">
+                                        <span className="inline-block mr-1">⚠</span>
+                                        {errors.content}
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="create-post-field">
-                            <label htmlFor="content">Content</label>
-                            <textarea
-                                id="content"
-                                placeholder="Write your post content here... Tell your story."
-                                value={data.content}
-                                onChange={(event) => setData('content', event.target.value)}
-                            />
-                            {errors.content ? <div className="mt-1 text-sm text-error">{errors.content}</div> : null}
-                        </div>
-
-                        <div className="create-post-actions">
-                            <Link href="/admin/blog" className="create-post-btn create-post-btn-ghost">
+                        {/* Form Actions */}
+                        <div className="divider my-4"></div>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
+                            <Link 
+                                href="/admin/blog" 
+                                className="btn btn-outline btn-lg font-semibold rounded-lg order-2 sm:order-1"
+                            >
                                 Cancel
                             </Link>
                             <button
-                                className="create-post-btn create-post-btn-primary"
+                                className="btn btn-primary btn-lg font-semibold rounded-lg order-1 sm:order-2"
                                 type="submit"
                                 disabled={processing}
                             >
-                                {processing ? processingLabel : submitLabel}
+                                {processing ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        {processingLabel}
+                                    </>
+                                ) : (
+                                    submitLabel
+                                )}
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <ImageLightbox src={activeImage} alt={post?.title ?? 'Post image'} onClose={() => setActiveImage(null)} />
         </div>
     );
 }

@@ -20,6 +20,7 @@ Route::get('/', function () {
             'week' => $post->week,
             'date' => $post->date?->toDateString(),
             'featured_image' => $post->featured_image_url,
+            'featured_images' => $post->featured_images,
         ])
         ->values();
 
