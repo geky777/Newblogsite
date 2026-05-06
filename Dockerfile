@@ -16,6 +16,11 @@ COPY conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
 COPY . /var/www/html
 COPY --from=assets /app/public/build /var/www/html/public/build
 
+RUN sed -i \
+    -e "s#^listen = .*#listen = 127.0.0.1:9000#g" \
+    -e "s#^;listen.allowed_clients =.*#listen.allowed_clients = 127.0.0.1#g" \
+    /usr/local/etc/php-fpm.d/www.conf
+
 RUN mkdir -p \
     /var/www/html/storage/logs \
     /var/www/html/storage/framework/cache/data \
