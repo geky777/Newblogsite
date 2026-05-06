@@ -49,7 +49,7 @@ class BlogController extends Controller
         ]);
 
         return redirect()
-            ->route('blog.index')
+            ->route('admin.blog.index')
             ->with('success', 'Post created successfully.');
     }
 
@@ -81,7 +81,7 @@ class BlogController extends Controller
         ]);
 
         return redirect()
-            ->route('blog.show', $post->fresh())
+            ->route('admin.blog.index')
             ->with('success', 'Post updated successfully.');
     }
 
@@ -93,7 +93,7 @@ class BlogController extends Controller
         $this->deleteImage($featuredImageUrl);
 
         return redirect()
-            ->route('blog.index')
+            ->route('admin.blog.index')
             ->with('success', 'Post deleted successfully.');
     }
 
@@ -119,7 +119,7 @@ class BlogController extends Controller
             'task' => $post->task,
             'week' => $post->week,
             'date' => $post->date?->toDateString(),
-            'featured_image' => $post->featured_image,
+            'featured_image' => $post->featured_image_url,
             'created_at' => $post->created_at?->toDateTimeString(),
         ];
     }
@@ -156,6 +156,10 @@ class BlogController extends Controller
             return null;
         }
 
+        if (preg_match('/^(https?:)?\/\//i', $imageUrl) === 1 || Str::startsWith($imageUrl, 'data:')) {
+            return null;
+        }
+
         $path = parse_url($imageUrl, PHP_URL_PATH) ?: $imageUrl;
 
         if (Str::startsWith($path, '/storage/')) {
@@ -164,6 +168,20 @@ class BlogController extends Controller
 
         if (Str::startsWith($path, 'storage/')) {
             return Str::after($path, 'storage/');
+        }
+
+        if (Str::startsWith($path, '/blog-featured/')) {
+            return Str::after($path, '/');
+        }
+
+        if (Str::startsWith($path, 'blog-featured/')) {
+            return $path;
+        }
+
+        $trimmedPath = ltrim($path, '/');
+
+        if ($trimmedPath !== '' && ! Str::contains($trimmedPath, '/')) {
+            return 'blog-featured/'.$trimmedPath;
         }
 
         return null;

@@ -19,7 +19,7 @@ Route::get('/', function () {
             'slug' => $post->slug,
             'week' => $post->week,
             'date' => $post->date?->toDateString(),
-            'featured_image' => $post->featured_image,
+            'featured_image' => $post->featured_image_url,
         ])
         ->values();
 
@@ -38,7 +38,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [AdminSessionController::class, 'destroy'])->middleware('admin')->name('logout');
 
     Route::prefix('blog')->name('blog.')->middleware('admin')->group(function () {
-        Route::redirect('/', '/')->name('index');
+        Route::get('/', [AdminBlogController::class, 'index'])->name('index');
         Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
         Route::post('/', [AdminBlogController::class, 'store'])->name('store');
         Route::get('/{post}/edit', [AdminBlogController::class, 'edit'])->name('edit');

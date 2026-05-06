@@ -38,7 +38,7 @@ class BlogController extends Controller
             'task' => $post->task,
             'week' => $post->week,
             'date' => $post->date?->toDateString(),
-            'featured_image' => $post->featured_image,
+            'featured_image' => $post->featured_image_url,
         ];
     }
 

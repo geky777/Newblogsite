@@ -14,7 +14,7 @@ class AdminSessionController extends Controller
     public function create(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
         if ($request->user()?->isAdmin()) {
-            return redirect()->route('home');
+            return redirect()->route('admin.blog.index');
         }
 
         if ($request->user()) {
@@ -52,7 +52,7 @@ class AdminSessionController extends Controller
         }
 
         return redirect()
-            ->route('home')
+            ->route('admin.blog.index')
             ->with('success', 'Admin mode enabled. Blog controls are now visible.');
     }
 
