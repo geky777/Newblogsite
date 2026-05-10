@@ -4,8 +4,13 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\AdminSessionController;
+use App\Http\Controllers\BlogFeaturedImageController;
 use App\Http\Controllers\BlogController;
 use App\Models\Post;
+
+Route::get('/storage/blog-featured/{filename}', BlogFeaturedImageController::class)
+    ->where('filename', '[^/]+')
+    ->name('storage.blog-featured');
 
 Route::get('/', function () {
     $recentPosts = Post::query()
