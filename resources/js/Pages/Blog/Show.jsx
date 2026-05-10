@@ -3,6 +3,18 @@ import { Link, router, usePage } from '@inertiajs/react';
 import FlashBanner from '../../Components/FlashBanner';
 import ImageLightbox from '../../Components/ImageLightbox';
 
+const galleryGridClass = (imageCount) => {
+    if (imageCount <= 1) {
+        return 'grid grid-cols-1 gap-3';
+    }
+
+    if (imageCount === 2) {
+        return 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+    }
+
+    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3';
+};
+
 export default function Show({ post }) {
     const { auth = {} } = usePage().props;
     const fallbackImage = 'https://img.daisyui.com/images/stock/photo-1504384308090-c894fdcc538d.webp';
@@ -11,7 +23,6 @@ export default function Show({ post }) {
         : [post?.featured_image || fallbackImage];
     const galleryImages = postImages.slice(0, 9);
     const hiddenImageCount = Math.max(postImages.length - galleryImages.length, 0);
-    const lastRowRemainder = galleryImages.length % 3;
     const isAdmin = auth.user?.role === 'admin';
     const [activeImage, setActiveImage] = useState(null);
 
@@ -50,19 +61,6 @@ export default function Show({ post }) {
                         </p>
                     </div>
 
-                    {/* Featured Image */}
-                    {post.featured_image && (
-                        <div className="mb-8">
-                            <figure className="rounded-xl overflow-hidden border border-base-300 shadow-lg">
-                                <img
-                                    className="w-full h-auto object-cover max-h-96"
-                                    src={post.featured_image}
-                                    alt={post.title}
-                                />
-                            </figure>
-                        </div>
-                    )}
-
                     {/* Article Body */}
                     <div className="prose max-w-none mb-12">
                         <div className="card bg-base-100 border border-base-300 shadow-md p-8">
@@ -75,18 +73,11 @@ export default function Show({ post }) {
                     {/* Gallery */}
                     {galleryImages.length > 0 && (
                         <div className="mb-12">
-                            <h2 className="text-2xl font-bold text-base-content mb-6">Gallery</h2>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className={galleryGridClass(galleryImages.length)}>
                                 {galleryImages.map((image, index) => (
                                     <figure
                                         key={`${image}-${index}`}
-                                        className={`group relative aspect-square cursor-pointer ${
-                                            lastRowRemainder === 1 && index === galleryImages.length - 1
-                                                ? 'col-start-2'
-                                                : lastRowRemainder === 2 && index === galleryImages.length - 1
-                                                    ? 'col-start-3'
-                                                    : ''
-                                        }`}
+                                        className={`group relative cursor-pointer ${galleryImages.length === 1 ? 'aspect-video' : 'aspect-square'}`}
                                     >
                                         <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
                                             <button

@@ -8,6 +8,18 @@ const normalizeDate = (value) => {
     return value.slice(0, 10);
 };
 
+const galleryGridClass = (imageCount) => {
+    if (imageCount <= 1) {
+        return 'grid grid-cols-1 gap-3';
+    }
+
+    if (imageCount === 2) {
+        return 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+    }
+
+    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3';
+};
+
 export default function BlogPostForm({
     formTitle,
     formAccent,
@@ -34,7 +46,6 @@ export default function BlogPostForm({
     const existingImages = Array.isArray(post?.featured_images) && post.featured_images.length > 0
         ? post.featured_images
         : (post?.featured_image ? [post.featured_image] : []);
-    const existingImagesRemainder = existingImages.length % 3;
     const featuredImageErrors = [
         errors.featured_images,
         ...Object.entries(errors)
@@ -190,17 +201,11 @@ export default function BlogPostForm({
                                 {existingImages.length > 0 && (
                                     <div className="space-y-2">
                                         <p className="text-sm text-base-content/70 font-medium">Current Images</p>
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className={galleryGridClass(existingImages.length)}>
                                             {existingImages.map((image, index) => (
                                                 <figure
                                                     key={`${image}-${index}`}
-                                                    className={`group aspect-square ${
-                                                        existingImagesRemainder === 1 && index === existingImages.length - 1
-                                                            ? 'col-start-2'
-                                                            : existingImagesRemainder === 2 && index === existingImages.length - 1
-                                                                ? 'col-start-3'
-                                                                : ''
-                                                    }`}
+                                                    className={existingImages.length === 1 ? 'group aspect-video' : 'group aspect-square'}
                                                 >
                                                     <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
                                                         <button
