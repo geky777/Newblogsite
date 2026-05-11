@@ -152,10 +152,11 @@ class BlogController extends Controller
 
     protected function deleteImage(?string $imageUrl): void
     {
-        $path = $this->resolvePublicDiskPath($imageUrl);
+        $diskName = $this->imagesDiskName();
+        $path = $this->resolveDiskPath($imageUrl, $diskName);
 
         if ($path) {
-            Storage::disk('public')->delete($path);
+            Storage::disk($diskName)->delete($path);
         }
     }
 
@@ -168,9 +169,12 @@ class BlogController extends Controller
             $files = [$request->file('featured_image')];
         }
 
+        $diskName = $this->imagesDiskName();
+        $disk = Storage::disk($diskName);
+
         return collect($files)
             ->filter()
-            ->map(fn ($file) => Storage::url($file->store('blog-featured', 'public')))
+            ->map(fn ($file) => $disk->url($file->store('blog-featured', $diskName)))
             ->values()
             ->all();
     }
@@ -205,6 +209,48 @@ class BlogController extends Controller
         $encodedValue = json_encode($imageUrls, JSON_UNESCAPED_SLASHES);
 
         return is_string($encodedValue) ? $encodedValue : $imageUrls[0];
+    }
+
+    protected function resolveDiskPath(?string $imageUrl, string $diskName): ?string
+    {
+        if (! $imageUrl) {
+            return null;
+        }
+
+        if ($diskName === 'public') {
+            return $this->resolvePublicDiskPath($imageUrl);
+        }
+
+        if (Str::startsWith($imageUrl, 'data:')) {
+            return null;
+        }
+
+        $path = parse_url($imageUrl, PHP_URL_PATH) ?: $imageUrl;
+        $trimmedPath = ltrim((string) $path, '/');
+        $bucket = trim((string) env('SUPABASE_STORAGE_BUCKET', ''), '/');
+
+        if ($bucket !== '') {
+            $publicPrefix = 'storage/v1/object/public/'.$bucket.'/';
+            $signedPrefix = 'storage/v1/object/sign/'.$bucket.'/';
+
+            if (Str::startsWith($trimmedPath, $publicPrefix)) {
+                return Str::after($trimmedPath, $publicPrefix);
+            }
+
+            if (Str::startsWith($trimmedPath, $signedPrefix)) {
+                return Str::after($trimmedPath, $signedPrefix);
+            }
+        }
+
+        if (Str::startsWith($trimmedPath, 'blog-featured/')) {
+            return $trimmedPath;
+        }
+
+        if ($trimmedPath !== '' && ! Str::contains($trimmedPath, '/')) {
+            return 'blog-featured/'.$trimmedPath;
+        }
+
+        return $trimmedPath !== '' ? $trimmedPath : null;
     }
 
     protected function resolvePublicDiskPath(?string $imageUrl): ?string
@@ -242,6 +288,11 @@ class BlogController extends Controller
         }
 
         return null;
+    }
+
+    protected function imagesDiskName(): string
+    {
+        return (string) config('filesystems.blog_images_disk', 'public');
     }
 
     protected function comparePosts(Post $first, Post $second): int

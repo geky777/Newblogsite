@@ -47,8 +47,6 @@
                         <nav class="hidden sm:flex items-center gap-6">
                             <a href="/" class="text-sm font-medium text-base-content/70 hover:text-primary transition-colors">Home</a>
                             <a href="/blog" class="text-sm font-medium @if(request()->routeIs('blog.*')) text-primary @else text-base-content/70 hover:text-primary @endif transition-colors">Blog</a>
-                            <a href="#" class="text-sm font-medium text-base-content/70 hover:text-primary transition-colors">Documents</a>
-                            <a href="#" class="text-sm font-medium text-base-content/70 hover:text-primary transition-colors">About Me</a>
                         </nav>
 
                         <!-- Mobile Menu Hamburger -->
@@ -62,8 +60,6 @@
                                 <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 border border-base-300">
                                     <li><a href="/">Home</a></li>
                                     <li><a href="/blog">Blog</a></li>
-                                    <li><a href="#">Documents</a></li>
-                                    <li><a href="#">About Me</a></li>
                                 </ul>
                             </div>
                         </div>
