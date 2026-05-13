@@ -62,13 +62,15 @@ class BlogController extends Controller
     {
         $validated = $this->validatePost($request);
         $existingImageUrls = $this->decodeStoredImages($post->getRawOriginal('featured_image'));
+        $removedImageUrls = $this->validatedRemovedImageUrls($request, $existingImageUrls);
         $uploadedImageUrls = $this->storeUploadedImages($request);
-        $updatedImageUrls = $existingImageUrls;
+        $updatedImageUrls = array_values(array_filter(
+            $existingImageUrls,
+            fn (string $imageUrl) => ! $this->sameImageInList($imageUrl, $removedImageUrls)
+        ));
 
-        if ($uploadedImageUrls !== []) {
-            $this->deleteImages($existingImageUrls);
-            $updatedImageUrls = $uploadedImageUrls;
-        }
+        $this->deleteImages($removedImageUrls);
+        $updatedImageUrls = array_values(array_merge($updatedImageUrls, $uploadedImageUrls));
 
         $post->update([
             'title' => $validated['title'],
@@ -108,6 +110,8 @@ class BlogController extends Controller
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'featured_images' => ['nullable', 'array', 'max:10'],
             'featured_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'removed_featured_images' => ['nullable', 'array'],
+            'removed_featured_images.*' => ['string'],
         ]);
     }
 
@@ -202,6 +206,31 @@ class BlogController extends Controller
         $file->move($directory, $filename);
 
         return '/blog-featured-images/'.$filename;
+    }
+
+    protected function validatedRemovedImageUrls(Request $request, array $existingImageUrls): array
+    {
+        $removedImageUrls = $request->input('removed_featured_images', []);
+        $removedImageUrls = is_array($removedImageUrls) ? $removedImageUrls : [];
+
+        return collect($existingImageUrls)
+            ->filter(fn (string $existingImageUrl) => $this->sameImageInList($existingImageUrl, $removedImageUrls))
+            ->values()
+            ->all();
+    }
+
+    protected function sameImageInList(string $imageUrl, array $imageUrls): bool
+    {
+        return collect($imageUrls)
+            ->filter(fn ($candidate) => is_string($candidate))
+            ->contains(fn (string $candidate) => $this->imageBasename($candidate) === $this->imageBasename($imageUrl));
+    }
+
+    protected function imageBasename(string $imageUrl): string
+    {
+        $path = parse_url($imageUrl, PHP_URL_PATH) ?: $imageUrl;
+
+        return basename((string) $path);
     }
 
     protected function decodeStoredImages(?string $storedValue): array
@@ -323,6 +352,10 @@ class BlogController extends Controller
 
         $path = parse_url($imageUrl, PHP_URL_PATH) ?: $imageUrl;
         $trimmedPath = ltrim((string) $path, '/');
+
+        if (Str::startsWith($trimmedPath, 'blog-featured-images/')) {
+            return public_path('images/blog-featured/'.basename($trimmedPath));
+        }
 
         if (Str::startsWith($trimmedPath, 'images/blog-featured/')) {
             return public_path($trimmedPath);

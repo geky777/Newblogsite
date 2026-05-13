@@ -36,16 +36,19 @@ export default function BlogPostForm({
         week: post?.week ?? '',
         date: normalizeDate(post?.date ?? ''),
         featured_images: [],
+        removed_featured_images: [],
         ...(submitMethod === 'put' ? { _method: 'put' } : {}),
     });
 
     const selectedFiles = Array.isArray(data.featured_images) ? data.featured_images : [];
+    const removedImages = Array.isArray(data.removed_featured_images) ? data.removed_featured_images : [];
     const selectedFileNames = selectedFiles
         .map((file) => file?.name)
         .filter((name) => typeof name === 'string' && name !== '');
     const existingImages = Array.isArray(post?.featured_images) && post.featured_images.length > 0
         ? post.featured_images
         : (post?.featured_image ? [post.featured_image] : []);
+    const visibleExistingImages = existingImages.filter((image) => !removedImages.includes(image));
     const featuredImageErrors = [
         errors.featured_images,
         ...Object.entries(errors)
@@ -57,6 +60,14 @@ export default function BlogPostForm({
     const handleSubmit = (event) => {
         event.preventDefault();
         sendPost(submitUrl, { forceFormData: true });
+    };
+
+    const removeExistingImage = (image) => {
+        if (removedImages.includes(image)) {
+            return;
+        }
+
+        setData('removed_featured_images', [...removedImages, image]);
     };
 
     return (
@@ -198,16 +209,16 @@ export default function BlogPostForm({
                                 </label>
 
                                 {/* Existing Images Gallery */}
-                                {existingImages.length > 0 && (
+                                {visibleExistingImages.length > 0 && (
                                     <div className="space-y-2">
                                         <p className="text-sm text-base-content/70 font-medium">Current Images</p>
-                                        <div className={galleryGridClass(existingImages.length)}>
-                                            {existingImages.map((image, index) => (
+                                        <div className={galleryGridClass(visibleExistingImages.length)}>
+                                            {visibleExistingImages.map((image, index) => (
                                                 <figure
                                                     key={`${image}-${index}`}
-                                                    className={existingImages.length === 1 ? 'group aspect-video' : 'group aspect-square'}
+                                                    className={visibleExistingImages.length === 1 ? 'group aspect-video' : 'group aspect-square'}
                                                 >
-                                                    <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                                                    <div className="card relative h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
                                                         <button
                                                             type="button"
                                                             className="block h-full w-full"
@@ -219,6 +230,16 @@ export default function BlogPostForm({
                                                                 alt={`${post?.title ?? 'Post'} ${index + 1}`}
                                                             />
                                                         </button>
+                                                        {submitMethod === 'put' ? (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-error btn-sm absolute right-2 top-2 z-10"
+                                                                onClick={() => removeExistingImage(image)}
+                                                                disabled={processing}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        ) : null}
                                                     </div>
                                                 </figure>
                                             ))}
