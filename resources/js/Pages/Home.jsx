@@ -18,7 +18,7 @@ export default function Home({ recentPosts = [] }) {
     return (
         <>
             {/* Hero Section */}
-            <section className="relative py-12 sm:py-16 lg:py-24 px-4 bg-gradient-to-b from-base-100 to-base-100/50">
+            <section className="relative pt-6 pb-12 sm:pt-8 sm:pb-16 lg:pt-12 lg:pb-24 px-4 bg-gradient-to-b from-base-100 to-base-100/50">
                 <div className="mx-auto max-w-7xl">
                     <div className="grid grid-cols-1 gap-12 lg:gap-16 lg:grid-cols-2 lg:items-center">
                         {/* Hero Content */}

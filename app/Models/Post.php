@@ -65,7 +65,23 @@ class Post extends Model
             return null;
         }
 
-        if (preg_match('/^(https?:)?\/\//i', $value) === 1 || Str::startsWith($value, 'data:')) {
+        if (preg_match('/^https?:\/\//i', $value) === 1) {
+            $path = parse_url($value, PHP_URL_PATH);
+            $host = parse_url($value, PHP_URL_HOST);
+            $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+            if (
+                is_string($path)
+                && Str::startsWith($path, '/storage/')
+                && in_array($host, array_filter([$appHost, 'localhost', '127.0.0.1']), true)
+            ) {
+                return $path;
+            }
+
+            return $value;
+        }
+
+        if (Str::startsWith($value, '//') || Str::startsWith($value, 'data:')) {
             return $value;
         }
 

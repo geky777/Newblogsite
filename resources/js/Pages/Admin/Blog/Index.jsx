@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/react';
 import AdminLayout from '../../../Layouts/AdminLayout';
 import ImageLightbox from '../../../Components/ImageLightbox';
 
-const fallbackImage = 'https://img.daisyui.com/images/stock/photo-1504384308090-c894fdcc538d.webp';
+const fallbackImage = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%230f1b22%22/%3E%3Ctext x=%22400%22 y=%22225%22 fill=%22%239ab8d8%22 font-family=%22Arial, sans-serif%22 font-size=%2232%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EImage unavailable%3C/text%3E%3C/svg%3E';
 
 const excerpt = (text, max = 140) => {
     if (typeof text !== 'string') return '';
@@ -104,7 +104,10 @@ export default function Index({ posts = [] }) {
                                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                                     src={post.featured_image || fallbackImage}
                                     alt={post.title}
-                                    onClick={() => setActiveImage(post.featured_image || fallbackImage)}
+                                    onError={(event) => {
+                                        event.currentTarget.src = fallbackImage;
+                                    }}
+                                    onClick={(event) => setActiveImage(event.currentTarget.currentSrc || fallbackImage)}
                                 />
                                 <div className="absolute top-4 left-4 z-10">
                                     <div className="badge badge-primary font-bold text-sm">{post.week}</div>

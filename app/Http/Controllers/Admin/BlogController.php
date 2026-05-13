@@ -174,7 +174,11 @@ class BlogController extends Controller
 
         return collect($files)
             ->filter()
-            ->map(fn ($file) => $disk->url($file->store('blog-featured', $diskName)))
+            ->map(function ($file) use ($disk, $diskName) {
+                $path = $file->store('blog-featured', $diskName);
+
+                return $diskName === 'public' ? '/storage/'.$path : $disk->url($path);
+            })
             ->values()
             ->all();
     }
