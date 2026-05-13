@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-labelledby="title">
+  <title id="title">Blog image placeholder</title>
+  <rect width="800" height="450" fill="#101820"/>
+  <rect x="52" y="48" width="696" height="354" rx="28" fill="#13242d" stroke="#294756" stroke-width="4"/>
+  <circle cx="224" cy="170" r="54" fill="#ff7f5c"/>
+  <path d="M108 346 272 232l102 70 84-56 234 100H108Z" fill="#9fc4e8"/>
+  <path d="M108 346 272 232l102 70 84-56 234 100" fill="none" stroke="#c8def3" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

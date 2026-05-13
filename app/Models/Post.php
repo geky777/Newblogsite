@@ -75,7 +75,7 @@ class Post extends Model
                 && Str::startsWith($path, '/storage/')
                 && in_array($host, array_filter([$appHost, 'localhost', '127.0.0.1']), true)
             ) {
-                return $path;
+                return $this->normalizeImagePath($path);
             }
 
             return $value;
@@ -85,24 +85,33 @@ class Post extends Model
             return $value;
         }
 
+        return $this->normalizeImagePath($value);
+    }
+
+    protected function normalizeImagePath(string $value): ?string
+    {
         $path = ltrim((string) (parse_url($value, PHP_URL_PATH) ?: $value), '/');
 
         if ($path === '') {
             return null;
         }
 
-        if (Str::startsWith($path, 'storage/')) {
+        if (Str::startsWith($path, 'images/blog-featured/')) {
             return '/'.$path;
         }
 
+        if (Str::startsWith($path, 'storage/blog-featured/')) {
+            return '/images/blog-featured/'.basename($path);
+        }
+
         if (Str::startsWith($path, 'blog-featured/')) {
-            return '/storage/'.$path;
+            return '/images/'.$path;
         }
 
         if (Str::contains($path, '/')) {
-            return '/storage/'.$path;
+            return '/'.$path;
         }
 
-        return '/storage/blog-featured/'.$path;
+        return '/images/blog-featured/'.$path;
     }
 }

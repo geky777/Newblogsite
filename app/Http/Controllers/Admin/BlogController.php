@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -153,7 +154,12 @@ class BlogController extends Controller
     protected function deleteImage(?string $imageUrl): void
     {
         $diskName = $this->imagesDiskName();
+        $projectImagePath = $this->resolveProjectImagePath($imageUrl);
         $path = $this->resolveDiskPath($imageUrl, $diskName);
+
+        if ($projectImagePath && File::exists($projectImagePath)) {
+            File::delete($projectImagePath);
+        }
 
         if ($path) {
             Storage::disk($diskName)->delete($path);
@@ -175,12 +181,27 @@ class BlogController extends Controller
         return collect($files)
             ->filter()
             ->map(function ($file) use ($disk, $diskName) {
+                if ($diskName === 'public') {
+                    return $this->storeProjectImage($file);
+                }
+
                 $path = $file->store('blog-featured', $diskName);
 
-                return $diskName === 'public' ? '/storage/'.$path : $disk->url($path);
+                return $disk->url($path);
             })
             ->values()
             ->all();
+    }
+
+    protected function storeProjectImage($file): string
+    {
+        $directory = public_path('images/blog-featured');
+        File::ensureDirectoryExists($directory);
+
+        $filename = $file->hashName();
+        $file->move($directory, $filename);
+
+        return '/images/blog-featured/'.$filename;
     }
 
     protected function decodeStoredImages(?string $storedValue): array
@@ -289,6 +310,30 @@ class BlogController extends Controller
 
         if ($trimmedPath !== '' && ! Str::contains($trimmedPath, '/')) {
             return 'blog-featured/'.$trimmedPath;
+        }
+
+        return null;
+    }
+
+    protected function resolveProjectImagePath(?string $imageUrl): ?string
+    {
+        if (! $imageUrl) {
+            return null;
+        }
+
+        $path = parse_url($imageUrl, PHP_URL_PATH) ?: $imageUrl;
+        $trimmedPath = ltrim((string) $path, '/');
+
+        if (Str::startsWith($trimmedPath, 'images/blog-featured/')) {
+            return public_path($trimmedPath);
+        }
+
+        if (Str::startsWith($trimmedPath, 'storage/blog-featured/')) {
+            return public_path('images/blog-featured/'.basename($trimmedPath));
+        }
+
+        if (Str::startsWith($trimmedPath, 'blog-featured/')) {
+            return public_path('images/'.trim($trimmedPath, '/'));
         }
 
         return null;

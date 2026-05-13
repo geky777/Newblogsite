@@ -5,7 +5,7 @@ import ImageLightbox from '../../Components/ImageLightbox';
 
 export default function Blog({ posts = [] }) {
     const { auth = {} } = usePage().props;
-    const fallbackImage = 'https://img.daisyui.com/images/stock/photo-1504384308090-c894fdcc538d.webp';
+    const fallbackImage = '/images/blog-featured/default.svg';
     const hasPosts = Array.isArray(posts) && posts.length > 0;
     const isAdmin = auth.user?.role === 'admin';
     const [activeImage, setActiveImage] = useState(null);
@@ -100,6 +100,9 @@ export default function Blog({ posts = [] }) {
                                                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                                                 src={post.featured_image || fallbackImage}
                                                 alt={post.title}
+                                                onError={(event) => {
+                                                    event.currentTarget.src = fallbackImage;
+                                                }}
                                             />
                                             {/* Week Badge */}
                                             <div className="absolute top-4 left-4 z-10">

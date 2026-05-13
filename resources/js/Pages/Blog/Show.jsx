@@ -17,7 +17,7 @@ const galleryGridClass = (imageCount) => {
 
 export default function Show({ post }) {
     const { auth = {} } = usePage().props;
-    const fallbackImage = 'https://img.daisyui.com/images/stock/photo-1504384308090-c894fdcc538d.webp';
+    const fallbackImage = '/images/blog-featured/default.svg';
     const postImages = Array.isArray(post?.featured_images) && post.featured_images.length > 0
         ? post.featured_images
         : [post?.featured_image || fallbackImage];
@@ -77,18 +77,21 @@ export default function Show({ post }) {
                                 {galleryImages.map((image, index) => (
                                     <figure
                                         key={`${image}-${index}`}
-                                        className={`group relative cursor-pointer ${galleryImages.length === 1 ? 'aspect-video' : 'aspect-square'}`}
+                                        className={`group relative cursor-pointer ${galleryImages.length === 1 ? '' : 'aspect-square'}`}
                                     >
-                                        <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="card h-full w-full overflow-hidden border border-base-300 bg-base-200 shadow-sm hover:shadow-md transition-shadow">
                                             <button
                                                 type="button"
-                                                className="relative block h-full w-full"
+                                                className={`relative flex h-full w-full items-center justify-center ${galleryImages.length === 1 ? 'max-h-[70vh]' : ''}`}
                                                 onClick={() => setActiveImage(image)}
                                             >
                                                 <img
-                                                    className="h-full w-full object-cover object-center transition-transform duration-200 group-hover:scale-105"
+                                                    className={`${galleryImages.length === 1 ? 'h-auto max-h-[70vh]' : 'h-full'} w-full object-contain object-center transition-transform duration-200 group-hover:scale-105`}
                                                     src={image}
                                                     alt={`${post.title} image ${index + 1}`}
+                                                    onError={(event) => {
+                                                        event.currentTarget.src = fallbackImage;
+                                                    }}
                                                 />
                                                 {hiddenImageCount > 0 && index === galleryImages.length - 1 ? (
                                                     <div className="absolute inset-0 flex items-center justify-center bg-black/55 text-sm font-semibold text-white">

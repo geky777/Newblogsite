@@ -24,6 +24,6 @@ class BlogFeaturedImageController extends Controller
             }
         }
 
-        return redirect('https://img.daisyui.com/images/stock/photo-1504384308090-c894fdcc538d.webp');
+        return redirect('/images/blog-featured/default.svg');
     }
 }
