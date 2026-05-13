@@ -17,7 +17,7 @@ const galleryGridClass = (imageCount) => {
 
 export default function Show({ post }) {
     const { auth = {} } = usePage().props;
-    const fallbackImage = '/images/blog-featured/default.svg';
+    const fallbackImage = '/blog-featured-images/default.svg';
     const postImages = Array.isArray(post?.featured_images) && post.featured_images.length > 0
         ? post.featured_images
         : [post?.featured_image || fallbackImage];

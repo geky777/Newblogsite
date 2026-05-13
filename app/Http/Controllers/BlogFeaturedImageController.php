@@ -13,10 +13,12 @@ class BlogFeaturedImageController extends Controller
     {
         abort_if($filename !== basename($filename), 404);
 
+        $projectPath = public_path('images/blog-featured/'.$filename);
         $storagePath = Storage::disk('public')->path('blog-featured/'.$filename);
         $legacyPath = public_path('legacy-blog-featured/'.$filename);
+        $defaultPath = public_path('images/blog-featured/default.svg');
 
-        foreach ([$storagePath, $legacyPath] as $path) {
+        foreach ([$projectPath, $storagePath, $legacyPath, $defaultPath] as $path) {
             if (is_file($path)) {
                 return response()->file($path, [
                     'Cache-Control' => 'public, max-age=31536000',
@@ -24,6 +26,6 @@ class BlogFeaturedImageController extends Controller
             }
         }
 
-        return redirect('/images/blog-featured/default.svg');
+        abort(404);
     }
 }

@@ -201,7 +201,7 @@ class BlogController extends Controller
         $filename = $file->hashName();
         $file->move($directory, $filename);
 
-        return '/images/blog-featured/'.$filename;
+        return '/blog-featured-images/'.$filename;
     }
 
     protected function decodeStoredImages(?string $storedValue): array

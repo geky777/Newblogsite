@@ -4,7 +4,7 @@ import FlashBanner from '../Components/FlashBanner';
 
 export default function Home({ recentPosts = [] }) {
     const { auth = {} } = usePage().props;
-    const fallbackImage = '/images/blog-featured/default.svg';
+    const fallbackImage = '/blog-featured-images/default.svg';
     const isAdmin = auth.user?.role === 'admin';
 
     const handleDelete = (post) => {

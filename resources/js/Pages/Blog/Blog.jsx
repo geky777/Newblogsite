@@ -5,7 +5,7 @@ import ImageLightbox from '../../Components/ImageLightbox';
 
 export default function Blog({ posts = [] }) {
     const { auth = {} } = usePage().props;
-    const fallbackImage = '/images/blog-featured/default.svg';
+    const fallbackImage = '/blog-featured-images/default.svg';
     const hasPosts = Array.isArray(posts) && posts.length > 0;
     const isAdmin = auth.user?.role === 'admin';
     const [activeImage, setActiveImage] = useState(null);

@@ -12,6 +12,10 @@ Route::get('/storage/blog-featured/{filename}', BlogFeaturedImageController::cla
     ->where('filename', '[^/]+')
     ->name('storage.blog-featured');
 
+Route::get('/blog-featured-images/{filename}', BlogFeaturedImageController::class)
+    ->where('filename', '[^/]+')
+    ->name('blog-featured-images.show');
+
 Route::get('/', function () {
     $recentPosts = Post::query()
         ->orderBy('created_at', 'desc')

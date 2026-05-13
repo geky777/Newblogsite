@@ -97,21 +97,21 @@ class Post extends Model
         }
 
         if (Str::startsWith($path, 'images/blog-featured/')) {
-            return '/'.$path;
+            return '/blog-featured-images/'.basename($path);
         }
 
         if (Str::startsWith($path, 'storage/blog-featured/')) {
-            return '/images/blog-featured/'.basename($path);
+            return '/blog-featured-images/'.basename($path);
         }
 
         if (Str::startsWith($path, 'blog-featured/')) {
-            return '/images/'.$path;
+            return '/blog-featured-images/'.basename($path);
         }
 
         if (Str::contains($path, '/')) {
             return '/'.$path;
         }
 
-        return '/images/blog-featured/'.$path;
+        return '/blog-featured-images/'.$path;
     }
 }

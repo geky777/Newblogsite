@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/react';
 import AdminLayout from '../../../Layouts/AdminLayout';
 import ImageLightbox from '../../../Components/ImageLightbox';
 
-const fallbackImage = '/images/blog-featured/default.svg';
+const fallbackImage = '/blog-featured-images/default.svg';
 
 const excerpt = (text, max = 140) => {
     if (typeof text !== 'string') return '';
